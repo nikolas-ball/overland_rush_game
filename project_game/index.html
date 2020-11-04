@@ -1,0 +1,118 @@
+<!-- 
+		Name: Nikolas Ball
+		Date: 11/3/2020
+		Class: CSCI2447, Javascript Fundamentals
+		Project 3
+ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>Overland Rush (CSCI2447)</title>
+    <link rel='shortcut icon' type='image/x-icon' href='./img/favicon.ico' />
+    <!-- CSS styles: This is for me to worry about; not you. -->
+	<link href="css/game.css" rel="stylesheet" />
+    <script src="./js/jquery-3.5.1.js"></script>
+    <script>	
+		const timeCount = () => {
+			let seconds = 30;
+				let countdownTimer = setInterval(() => {
+				if(seconds <= 28){
+					clearInterval(countdownTimer);				
+				} else {
+					$(".thirtySeconds").text(`${seconds} Seconds Left`);
+				}
+				seconds = 29;
+				}, 1000);
+		}	
+		const beginGame = () => {
+			timeCount();
+			addImage();
+			alert('the X-axis random number is: ' + randomX());
+			alert('the Y-axis random number is: ' + randomY());
+			incrementScore(userScore);
+			$(".thirtySeconds").css("visibility", "visible");
+		}
+		const randomX = () => {
+			let min = 0;
+    		let Xmax = 1125;
+    		return Math.floor(Math.random() * (Xmax - min + 1)) + min;
+		}
+		const randomY = () => {
+			let min = 0;
+    		let Ymax = 350;
+    		return Math.floor(Math.random() * (Ymax - min + 1)) + min;
+		}
+		var userScore = 0;
+		incrementScore = userScore => {
+			userScore = userScore + 1;
+			document.getElementById("score").innerHTML = userScore + (userScore === 1 ? ' pt' : ' pts');
+		}
+		const addImage = () => {
+			document.getElementById("gamespace").innerHTML = '<img class="gameimage" src="img/jeep.png" />';
+		}
+		$(document).ready(function() {
+    		let firstName = prompt("What is your first name?");
+			document.getElementById("name").innerHTML = firstName;	
+			$("#start_button").click(function(){
+        		beginGame();
+				$("#start_button").text("Started!")
+				$("#start_button").css({
+				'border' : '2px solid gray',
+				'color' : 'gray'
+				});
+   			});
+			$("#start_button").css({
+   				'font-size' : '18px',
+   				'width' : '150px',
+   				'height' : '70px',
+				'color' : 'black',
+				'background-color': 'white',
+				'border' : '2px solid black'
+			});
+			$("#start_button").mouseover(function() {
+  				$(this).css({
+					  "border": "2px solid gray"
+				});
+			});
+			$("#start_button").mouseout(function() {
+  				$(this).css({
+					  "border": "2px solid black"
+				});
+			});
+			
+		});
+    </script>
+  </head>
+  <body>
+
+	<div id="content">
+
+		<h1>Overland Rush ⛰️</h1>
+			<div style=" text-align:center;">
+		<div>After clicking "start", you will have 30 seconds to drive the <em>Jeep Wrangler</em> across the map using the arrow keys. <br/>Try to collect as many rewards as you can!
+			<br/>
+			<span><strong>Are you ready to get started <span id="name">firstName</span>?</strong></span>
+			<br/>
+			<br/>
+		<img class="jeepRocks" src="img/jeeprocks.jpg">
+		</div>
+		
+		</div>
+		<div id="controls">
+			<span id="score">0 pts</span>
+			<button type="button" id="start_button">Start!</button>
+		</div>
+		<div class="thirtySeconds">30 Seconds Left</div>
+		
+		
+		<div id="gamespace">
+
+			
+			
+		</div>
+		
+	</div>
+  </body>
+</html>

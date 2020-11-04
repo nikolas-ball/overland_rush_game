@@ -1,0 +1,65 @@
+/* CSS Document */
+
+html, body {
+	
+	margin: 0 auto;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-size: 21px;
+	color: #333;
+	background: rgb(202,175,103) url("../img/backgrounddetailed.png"); 
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+
+	
+h1 {
+	margin: 2px;
+}
+	
+button {
+	font-size: 12px;
+	font-weight: bold;
+	padding: 8px; }
+	
+div#content {
+    width: 1150px;
+    margin:0 auto;
+	padding: 20px;
+	background-color: #EEE ; }
+	
+div#controls {
+	text-align: right; }
+	
+div#controls span {
+	font-weight: bold;
+	color: #990000; }
+	
+div#controls button {
+	margin-left: 20px; }
+	
+div.thirtySeconds {
+	visibility: hidden;
+	font-weight: bold;
+}
+	
+div#gamespace {
+	margin: auto;
+	padding: 10px;
+	height: 350px;
+	width: 1125px;
+	background-color: #FFF;
+	border: 2px solid #CCC; }
+
+.gameimage {
+	display: block;
+	width: 100px;
+}
+
+.jeepRocks {
+	width: 800px;
+}
