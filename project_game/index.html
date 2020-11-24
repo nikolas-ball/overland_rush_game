@@ -1,8 +1,8 @@
 <!-- 
 		Name: Nikolas Ball
-		Date: 11/10/2020
+		Date: 11/23/2020
 		Class: CSCI2447, Javascript Fundamentals
-		Project 4
+		Project 5
  -->
 
 <!DOCTYPE html>
@@ -13,32 +13,248 @@
     <link rel='shortcut icon' type='image/x-icon' href='./img/favicon.ico' />
     <!-- CSS styles: This is for me to worry about; not you. -->
 	<link href="css/game.css" rel="stylesheet" />
-    <script src="./js/jquery-3.5.1.js"></script>
-    <script type="text/javascript">	
-	 		
-		const timeCount = () => {
-			let seconds = 30;
-				let countdownTimer = setInterval(() => {
-				if(seconds === -1){
-					clearInterval(countdownTimer);	
-					alert('GAME OVER');
-					document.body.innerHTML = `
-					<h1 style="margin-top: 200px; margin-left:600px;">Overland Rush ⛰️</h1>
-					<h3 style="margin-top: 0px; margin-left:615px;">Created By: Nikolas Ball</h3>
-					`;			
+	<script src="./js/jquery-3.5.1.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script>
+
+		$(document).ready(function() {
+    		let firstName = prompt("What is your first name?");
+			document.getElementById("name").innerHTML = firstName;
+			$( "#dialog" ).dialog();
+			$("#start_button").click(function(){
+        		startGame();
+				$("#start_button").text("Started!")
+				$("#start_button").css({
+				'border' : '2px solid gray',
+				'color' : 'gray',
+				'pointer-events': 'none'
+				});
+   			});
+			$("#start_button").css({
+   				'font-size' : '18px',
+   				'width' : '150px',
+   				'height' : '70px',
+				'color' : 'black',
+				'background-color': 'white',
+				'border' : '2px solid black'
+			});
+			$("#start_button").mouseover(function() {
+  				$(this).css({
+					  "border": "2px solid gray"
+				});
+			});
+			$("#start_button").mouseout(function() {
+  				$(this).css({
+					  "border": "2px solid black"
+				});
+			});
+		});
+
+		window.onload = window.onresize = function() {
+			let canvas = document.getElementById('canvas');
+			canvas.width = window.innerWidth * 0.8;
+			canvas.height = window.innerHeight * 0.8;
+		}
+		let gamePiece;
+		let myObstacles = [];
+	
+	function startGame() {
+		gamePiece = new mountainComponent(130, 80, "img/jeepRight.png", 10, 240, "image");
+		gameArea.start();
+		timeCount();
+	}
+	
+	const timeCount = () => {
+			let score = 0;
+				let countupTimer = setInterval(() => {
+				if(score === 999){
+					clearInterval(countupTimer);	
+					alert('GAME OVER - Timeout of 999 seconds reached. You are either a pro, or you are hacking.');			
 				} else {
-					$(".thirtySeconds").text(`${seconds} ${seconds === 1 ? 'Second' : 'Seconds'} Left`);
+					$("#score").text(`${score} ${score === 1 ? 'point' : 'points'}`);
 				}
-				seconds -= 1;
+				score += 1;
 				}, 1000);
-		}	
-		const beginGame = () => {
-			timeCount();
-			
+			}
+
+	let gameArea = {
+		canvas : document.createElement("canvas"),
+		start : function() {
+			this.canvas.width = 960;
+			this.canvas.height = 540;
+			this.context = this.canvas.getContext("2d");
+			document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+			this.frameNumber = 0;
+			this.interval = setInterval(updateGameGrid, 7);
+			},
+		clear : function() {
+			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		},
+		stop : function() {
+			clearInterval(this.interval);
+		}
+	}
+
+		function mountainComponent(width, height, color, x, y, type) {
+		this.type = type;
+		if (type == "image") {
+			this.image = new Image();
+			this.image.src = color;
+		}
+		this.width = width;
+		this.height = height;
+		this.speedX = 0;
+		this.speedY = 0;    
+		this.x = x;
+		this.y = y;    
+		this.update = () => {
+			ctx = gameArea.context;
+			if (type == "image") {
+			ctx.drawImage(this.image,
+				this.x,
+				this.y,
+				this.width, this.height);
+			}
+			else {
+			ctx.fillStyle = color;
+			ctx.strokeStyle = 'white';
+			ctx.beginPath();
+			ctx.moveTo(this.x, this.y);
+			ctx.lineTo(this.x + this.width, this.y + this.height);
+			ctx.lineTo(this.x + this.height, this.y - this.width);
+			ctx.lineTo(this.x, this.y);
+			ctx.fill();
+			ctx.stroke();
+			}
+		}
+		this.newPosition = () => {
+			this.x += this.speedX;
+			this.y += this.speedY;        
+		}    
+		this.crashWith = function(otherObject) {
+			let left = this.x;
+			let right = this.x + (this.width-20);
+			let top = this.y;
+			let bottom = this.y + (this.height-10);
+			let otherLeft = otherObject.x;
+			let otherRight = otherObject.x + (otherObject.width);
+			let otherTop = otherObject.y;
+			let otherBottom = otherObject.y + (otherObject.height);
+			let didCrash = true;
+			if ((bottom < otherTop) || (top > otherBottom) || (right < otherLeft) || (left > otherRight)) {
+				didCrash = false;
+			}
+			return didCrash;
+		}
+	}
+	
+	function updateGameGrid() {
+		let x;
+		let height;
+		let spaceBetween;
+		let minHeight;
+		let maxHeight;
+		let minGap;
+		let maxGap;
+		for (i = 0; i < myObstacles.length; i += 1) {
+			if (gamePiece.crashWith(myObstacles[i])) {
+				gameArea.stop();
+				alert('uh oh, you crashed.')
+				$('body').html('REFRESH TO PLAY AGAIN!');
+				return;
+			} 
+		}
+		gameArea.clear();
+		gameArea.frameNumber += 1;
+		if (gameArea.frameNumber == 1 || everyTime(150)) {
+			x = gameArea.canvas.width;
+			minHeight = 30;
+			maxHeight = 200;
+			height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
+			minGap = 250;
+			maxGap = 400;
+			spaceBetween = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
+			myObstacles.push(new mountainComponent(10, height, "gray", x, 0));
+			myObstacles.push(new mountainComponent(10, x - height - spaceBetween, "gray", x, height + spaceBetween));
+		}
+		for (i = 0; i < myObstacles.length; i += 1) {
+			myObstacles[i].x += -1;
+			myObstacles[i].update();
+		}
+		gamePiece.newPosition();    
+		gamePiece.update();
+	}
+	
+	function everyTime(n) {
+		if ((gameArea.frameNumber / n) % 1 == 0) {
+			return true;
+		}
+		return false;
+	}
+	
+	moveUp = () => {
+		gamePiece.speedY = -1; 
+	}
+	
+	moveDown = () => {
+		gamePiece.speedY = 1; 
+	}
+	
+	moveLeft = () => {
+		gamePiece.speedX = -1; 
+	}
+	
+	moveRight = () => {
+		gamePiece.speedX = 1; 
+	}
+	
+	const moveSelection = (event) => {
+                switch (event.keyCode) {
+                    case 37:
+					event.preventDefault();
+                    moveLeft();
+                    break;
+                    case 39:
+					event.preventDefault();
+                    moveRight();
+                    break;
+                    case 38:
+					event.preventDefault();
+                    moveUp();
+                    break;
+                    case 40:
+					event.preventDefault();
+                    moveDown();
+                    break;
+                    }
+                };
+			window.addEventListener('keydown', moveSelection);
+
+		/* 
+		commenting out below function due to the nature of my game after substantial revision, the timed
+		aspect does not necessarily make sense.
+		*/
+
+		// 	const timeCount = () => {
+		// 	let seconds = 30;
+		// 		let countdownTimer = setInterval(() => {
+		// 		if(seconds === -1){
+		// 			clearInterval(countdownTimer);	
+		// 			alert('GAME OVER');
+		// 			document.body.innerHTML = `
+		// 			<h1 style="margin-top: 200px; margin-left:600px;">Overland Rush ⛰️</h1>
+		// 			<h3 style="margin-top: 0px; margin-left:615px;">Created By: Nikolas Ball</h3>
+		// 			`;			
+		// 		} else {
+		// 			$(".thirtySeconds").text(`${seconds} ${seconds === 1 ? 'Second' : 'Seconds'} Left`);
+		// 		}
+		// 		seconds -= 1;
+		// 		}, 1000);
+		// }	
 			// alert('the X-axis random number is: ' + randomX());
 			// alert('the Y-axis random number is: ' + randomY());
 			//incrementScore(userScore);
-			$(".thirtySeconds").css("visibility", "visible");
+			//$(".thirtySeconds").css("visibility", "visible");
 			const leftArrowPressed = () => {
             let element = document.getElementById("gameimage");
 			$('#gameimage').css({ 'transform': 'rotate(180deg)'});
@@ -63,99 +279,36 @@
 			$('#gameimage').css({ 'transform': 'rotate(90deg)'});
             element.style.top = parseInt(element.style.top) + 5 + 'px';
             }
-
-            const moveSelection = (event) => {
-                switch (event.keyCode) {
-                    case 37:
-					event.preventDefault();
-                    leftArrowPressed();
-                    break;
-                    case 39:
-					event.preventDefault();
-                    rightArrowPressed();
-                    break;
-                    case 38:
-					event.preventDefault();
-                    upArrowPressed();
-                    break;
-                    case 40:
-					event.preventDefault();
-                    downArrowPressed();
-                    break;
-                    }
-                };
-			window.addEventListener('keydown', moveSelection);
+		
+		// const randomX = () => {
+		// 	let min = 0;
+    	// 	let Xmax = 1125;
+    	// 	return Math.floor(Math.random() * (Xmax - min + 1)) + min;
+		// }
+		// const randomY = () => {
+		// 	let min = 0;
+    	// 	let Ymax = 350;
+    	// 	return Math.floor(Math.random() * (Ymax - min + 1)) + min;
+		// }
+		
+	</script>
+	<style>
+		canvas {
+			position: absolute;
+			top: 800px;
+			bottom: 200px;
+			left: 0;
+			right: 0;
+			margin:auto;
+			background-image: url('img/cave.png');
+			z-index: 1000;
 		}
-		const randomX = () => {
-			let min = 0;
-    		let Xmax = 1125;
-    		return Math.floor(Math.random() * (Xmax - min + 1)) + min;
-		}
-		const randomY = () => {
-			let min = 0;
-    		let Ymax = 350;
-    		return Math.floor(Math.random() * (Ymax - min + 1)) + min;
-		}
-		var userScore = 0;
-		incrementScore = userScore => {
-			userScore = userScore + 1;
-			document.getElementById("score").innerHTML = userScore + (userScore === 1 ? ' pt' : ' pts');
-		}
-		const addImage = () => {
-			document.getElementById("gamespace").innerHTML = `
-			<img class="jeepRight" id="gameimage" style="position:absolute;left:150px; top:525px;z-index:1000;" height="70px" width="120px" src="img/jeepRight.png" /> 
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:650px; top:525px;" height="70px" width="100px" src="img/mountain.png" />
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:250px; top:725px;" height="70px" width="100px" src="img/mountain.png" />
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:550px; top:725px;" height="70px" width="100px" src="img/mountain.png" />
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:950px; top:625px;" height="70px" width="100px" src="img/mountain.png" />
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:1100px; top:546px;" height="70px" width="100px" src="img/mountain.png" />
-			<img class="obstacleimage" id="obstacleimage" style="position:absolute;left:1080px; top:800px;" height="70px" width="100px" src="img/mountain.png" />
-			`;
-		}
-		$(document).ready(function() {
-			if(window.innerWidth < 1300 || window.innerWidth > 1550){
-				alert(`Your browser width is ${window.innerWidth}px. Please use zoom-${window.innerWidth < 1300 ? 'out' : 'in'} functionality to adjust width to at least 1440px. If you do not adjust page zoom, the game may render incorrectly!`);
-			};
-    		let firstName = prompt("What is your first name?");
-			document.getElementById("name").innerHTML = firstName;
-			addImage();	
-			$("#start_button").click(function(){
-        		beginGame();
-				$("#start_button").text("Started!")
-				$("#start_button").css({
-				'border' : '2px solid gray',
-				'color' : 'gray'
-				});
-   			});
-			$("#start_button").css({
-   				'font-size' : '18px',
-   				'width' : '150px',
-   				'height' : '70px',
-				'color' : 'black',
-				'background-color': 'white',
-				'border' : '2px solid black'
-			});
-			$("#start_button").mouseover(function() {
-  				$(this).css({
-					  "border": "2px solid gray"
-				});
-			});
-			$("#start_button").mouseout(function() {
-  				$(this).css({
-					  "border": "2px solid black"
-				});
-			});
-			
-		});
-    </script>
+	</style>
   </head>
-  <body>
-
-	<div id="content">
-
-		<h1>Overland Rush ⛰️</h1>
-			<div style=" text-align:center;">
-		<div>After clicking "start", you will have 30 seconds to drive the <em>Jeep Wrangler</em> across the map using the arrow keys. <br/>Try to drive over as many boulders as you can!
+  <body id="content">
+	<h1 style="text-align:center;">Overland Rush ⛰️</h1>
+			<div style="text-align:center;">
+		<div>After clicking "start", you will get to drive the <em>Jeep Wrangler</em> inside the map using the arrow keys. <br/>Try to avoid the rocks, some are dangerous!
 			<br/>
 			<span><strong>Are you ready to get started <span id="name">firstName</span>?</strong></span>
 			<br/>
@@ -165,18 +318,20 @@
 		
 		</div>
 		<div id="controls">
-			<span id="score">0 pts</span>
+			<span id="score">0 points</span>
 			<button type="button" id="start_button">Start!</button>
 		</div>
-		<div class="thirtySeconds">30 Seconds Left</div>
 		
-		
-		<div id="gamespace" onkeydown="" onkeyup="">
-
-			
-			
-		</div>
-		
-	</div>
-  </body>
+		<!-- Here is my incorporated modal effect from the jQueryUI library  -->
+			<div id="dialog" title="Remember!" style="text-align:center;color:rgb(126, 5, 51); border: 3px solid black;z-index: 0!important;font-size: 15px;">
+			<br/>Use the arrow keys to avoid the rocks.
+			<br/>Some rocks are more dangerous than others, it's probably best to avoid them all.
+			<br/>Survive as long as you can.
+			<br/>Try to beat the world record of 250 points!</p>
+		  </div>
+		  <script>$( "#dialog" ).dialog({
+			modal: true
+		  });</script>
+		  
+	</body>
 </html>
