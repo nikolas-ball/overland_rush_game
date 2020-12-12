@@ -1,8 +1,8 @@
 <!-- 
 		Name: Nikolas Ball
-		Date: 11/23/2020
+		Date: 12/10/2020
 		Class: CSCI2447, Javascript Fundamentals
-		Project 5
+		Project 6
  -->
 
 <!DOCTYPE html>
@@ -67,9 +67,9 @@
 	const timeCount = () => {
 			let score = 0;
 				let countupTimer = setInterval(() => {
-				if(score === 999){
+				if(score === 250){
 					clearInterval(countupTimer);	
-					alert('GAME OVER - Timeout of 999 seconds reached. You are either a pro, or you are hacking.');			
+					alert('GAME OVER - Timeout of 250 seconds reached. You are either a pro, or you are hacking.');			
 				} else {
 					$("#score").text(`${score} ${score === 1 ? 'point' : 'points'}`);
 				}
@@ -129,8 +129,16 @@
 		}
 		this.newPosition = () => {
 			this.x += this.speedX;
-			this.y += this.speedY;        
+			this.y += this.speedY; 
+			this.hitSide();       
 		}    
+		this.hitSide = function() {
+        var bottom = gameArea.canvas.height - this.height;
+		var top = this.height + gameArea.canvas.height;
+        if (this.y > bottom) {
+            this.y = bottom;
+        }
+		}
 		this.crashWith = function(otherObject) {
 			let left = this.x;
 			let right = this.x + (this.width-20);
@@ -229,67 +237,7 @@
                     }
                 };
 			window.addEventListener('keydown', moveSelection);
-
-		/* 
-		commenting out below function due to the nature of my game after substantial revision, the timed
-		aspect does not necessarily make sense.
-		*/
-
-		// 	const timeCount = () => {
-		// 	let seconds = 30;
-		// 		let countdownTimer = setInterval(() => {
-		// 		if(seconds === -1){
-		// 			clearInterval(countdownTimer);	
-		// 			alert('GAME OVER');
-		// 			document.body.innerHTML = `
-		// 			<h1 style="margin-top: 200px; margin-left:600px;">Overland Rush ⛰️</h1>
-		// 			<h3 style="margin-top: 0px; margin-left:615px;">Created By: Nikolas Ball</h3>
-		// 			`;			
-		// 		} else {
-		// 			$(".thirtySeconds").text(`${seconds} ${seconds === 1 ? 'Second' : 'Seconds'} Left`);
-		// 		}
-		// 		seconds -= 1;
-		// 		}, 1000);
-		// }	
-			// alert('the X-axis random number is: ' + randomX());
-			// alert('the Y-axis random number is: ' + randomY());
-			//incrementScore(userScore);
-			//$(".thirtySeconds").css("visibility", "visible");
-			const leftArrowPressed = () => {
-            let element = document.getElementById("gameimage");
-			$('#gameimage').css({ 'transform': 'rotate(180deg)'});
-            element.style.left = parseInt(element.style.left) - 5 + 'px';
-            }
-
-            const rightArrowPressed = () => {
-            let element = document.getElementById("gameimage");
-			$('#gameimage').css({ 'transform': 'rotate(0deg)'});
-            element.style.left = parseInt(element.style.left) + 5 + 'px';
-
-            }
-
-            const upArrowPressed = () => {
-            let element = document.getElementById("gameimage");
-			$('#gameimage').css({ 'transform': 'rotate(270deg)'});
-            element.style.top = parseInt(element.style.top) - 5 + 'px';
-            }
-
-            const downArrowPressed = () => {
-            let element = document.getElementById("gameimage");
-			$('#gameimage').css({ 'transform': 'rotate(90deg)'});
-            element.style.top = parseInt(element.style.top) + 5 + 'px';
-            }
-		
-		// const randomX = () => {
-		// 	let min = 0;
-    	// 	let Xmax = 1125;
-    	// 	return Math.floor(Math.random() * (Xmax - min + 1)) + min;
-		// }
-		// const randomY = () => {
-		// 	let min = 0;
-    	// 	let Ymax = 350;
-    	// 	return Math.floor(Math.random() * (Ymax - min + 1)) + min;
-		// }
+			
 		
 	</script>
 	<style>
